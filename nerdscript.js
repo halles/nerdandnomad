@@ -41,6 +41,7 @@ function Matrix(args) {
   this.canvas.style.width = this.container.width() + "px";
   this.canvas.style.height = this.container.height() + "px";
   this.context.scale(2,2);
+  this.context.lineWidth = 0;
 
   this.dotProperties = {};
   this.dotProperties.width = _settings.dotWidth;
