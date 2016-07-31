@@ -52,8 +52,8 @@ function Matrix(args) {
   this.dotProperties.yArea = this.dotProperties.height + this.dotProperties.ySpace;
 
   this.minPadding = {};
-  this.minPadding.x = _settings.minPaddingX;
-  this.minPadding.y = _settings.minPaddingY;
+  this.minPadding.x = _settings.minPaddingX * 2;
+  this.minPadding.y = _settings.minPaddingY * 2;
 
   this.canvasHeight = function (){ return this.canvas.height; }
   this.canvasWidth = function (){ return this.canvas.width; }
@@ -62,8 +62,8 @@ function Matrix(args) {
   this.height = Math.floor(((this.canvasHeight() - this.minPadding.y * 2 - this.dotProperties.ySpace) / (this.dotProperties.height + this.dotProperties.ySpace))/2);
 
   this.padding = {};
-  this.padding.x = this.canvas.width / 2 - (this.width * (this.dotProperties.width + this.dotProperties.xSpace)) - this.dotProperties.xSpace - this.minPadding.x;
-  this.padding.y = this.canvas.height / 2 - (this.height * (this.dotProperties.height + this.dotProperties.ySpace)) - this.dotProperties.ySpace - this.minPadding.y;
+  this.padding.x = Math.floor(this.canvas.width / 2 - (this.width * (this.dotProperties.width + this.dotProperties.xSpace)) - this.dotProperties.xSpace - this.minPadding.x)*2;
+  this.padding.y = Math.floor(this.canvas.height / 2 - (this.height * (this.dotProperties.height + this.dotProperties.ySpace)) - this.dotProperties.ySpace - this.minPadding.y)*2;
 
   this.Grid = function(width, height, context){
 
