@@ -107,12 +107,11 @@ function Matrix(args) {
 
         var ctx = this.context;
 
-        ctx.fillStyle = 'black';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 0;
+        this.setColour( new Colour(200,200,200) );
+
+        ctx.fillStyle = this.getColour().toRgba(1);
 
         ctx.beginPath();
-        ctx.translate(0,0);
         ctx.ellipse(this.centerX, this.centerY, this.radiusX, this.radiusY, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.save();
