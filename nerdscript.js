@@ -16,7 +16,8 @@ function Matrix(args) {
     dotXSpace: 3,
     dotYSpace: 3,
     minPaddingX: 5,
-    minPaddingY: 5
+    minPaddingY: 5,
+    liveDraw: false
   }
 
   if(!args || args.length == 0){
@@ -79,7 +80,7 @@ function Matrix(args) {
 
       this.context = _grid.context;
 
-      this.colour = new Colour(50,50,50);
+      this.colour = new Colour(230,230,230);
       this.x = x;
       this.y = y;
       this.rotate = 0;
@@ -107,9 +108,8 @@ function Matrix(args) {
 
         var ctx = this.context;
 
-        this.setColour( new Colour(200,200,200) );
-
         ctx.fillStyle = this.getColour().toRgba(1);
+        ctx.strokeStyle = this.getColour().toRgba(1);
 
         ctx.beginPath();
         ctx.ellipse(this.centerX, this.centerY, this.radiusX, this.radiusY, 0, 0, 2 * Math.PI);
@@ -156,6 +156,29 @@ function Matrix(args) {
       }
     }
 
+    this.getDotAt = function(x,y){
+      x = x - _matrix.padding.x;
+      y = y - _matrix.padding.y;
+      var dotX = Math.floor(x / _matrix.dotProperties.xArea);
+      var dotY = Math.floor(y / _matrix.dotProperties.yArea);
+      if(this.dots[dotX][dotY] != undefined){
+        return this.dots[dotX][dotY];
+      }else{
+        return false;
+      }
+      //Math.sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0))
+    }
+
+    /** Grid Magics **/
+
+    this.write = function(){
+
+      _alphabet = {
+        a: [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5]]
+      }
+
+    }
+
     return this;
 
   }
@@ -179,6 +202,27 @@ function Matrix(args) {
     }
   }
 
+  this.testHit = function(x,y){
+    var hit;
+    return this.grid.getDotAt(x,y);
+  }
+
+  this.liveDrawDots = Array();
+
+  if(_settings.liveDraw){
+    setTimeout(function(){
+      log('liveDraw!');
+      _matrix.canvas.addEventListener('click', function(e) {
+        if(dot = _matrix.testHit(e.offsetX, e.offsetY)){
+          _matrix.liveDrawDots.push([dot.x,dot.y]);
+          dot.setColour(new Colour(204,0,0));
+          dot.draw();
+          log(JSON.stringify(_matrix.liveDrawDots));
+        }
+      }, true);
+    }, 1000);
+  }
+
   this.grid = new this.Grid(this.width, this.height, this.context);
 
   return this;
@@ -193,7 +237,7 @@ $(document).ready(function(){
       dotXSpace: 2,
       dotYSpace: 2,
       minPaddingX: 5,
-      minPaddingY: 5
+      minPaddingY: 5,
+      liveDraw: true
   });
-  log(matrix);
 });
