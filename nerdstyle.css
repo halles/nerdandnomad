@@ -13,10 +13,7 @@ html, body{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  pointer-events: none;
   margin: 9% auto 0 auto;
-  z-index: 20;
-  left: 0;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
