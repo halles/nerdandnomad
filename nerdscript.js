@@ -12,13 +12,12 @@ function Matrix(containerSelector, dotWidth = 5, dotHeight = 5, dotXSpace = 3, d
   this.selector = containerSelector;
   this.container = $(containerSelector);
   this.canvas = this.container.append('<canvas></canvas>').children('canvas')[0];
-  this.context = this.canvas.context;
+  this.context = this.canvas.getContext("2d");
 
   this.canvas.height = this.container.height();
   this.canvas.width = this.container.width();
 
   this.dotProperties = {};
-
   this.dotProperties.width = dotWidth;
   this.dotProperties.height = dotHeight;
   this.dotProperties.xSpace = dotXSpace;
