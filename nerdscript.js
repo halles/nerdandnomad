@@ -1,41 +1,48 @@
+var DEBUG = false;
 
-(function() {
-  $(function() {
+var log = function(){
+  if(!DEBUG) return;
+  for (var i = 0; i < arguments.length; i++) {
+    window.console.log(arguments[i]);
+  }
+}
 
-    var elSelector = '#nerdmatrix';
+function Matrix(containerSelector, dotWidth = 5, dotHeight = 5, dotXSpace = 3, dotYSpace = 3, minPaddingX = 5, minPaddingY = 5) {
 
-    if (!$(elSelector)) {
-      return;
-    }
+  this.selector = containerSelector;
+  this.container = $(containerSelector);
+  this.canvas = this.container.append('<canvas></canvas>').children('canvas')[0];
+  this.context = this.canvas.context;
 
-    var el = $(elSelector).append('<canvas></canvas>');
-    var canvasSelector = elSelector + " canvas";
+  this.canvas.height = this.container.height();
+  this.canvas.width = this.container.width();
 
-    $(canvasSelector)
-      .height(el.height())
-      .width(el.width());
+  this.dotProperties = {};
 
-    var
-      minPadding = {
-        x: 30,
-        y: 30
-      },
-      dot = { w: 5, h: 5, x_space: 3, y_space: 3 },
-      canvas = {
-        _instance: $(canvasSelector),
-        width: $(canvasSelector).width(),
-        height: $(canvasSelector).height(),
-      },
-      matrix = {
-        w: Math.floor((canvas.width - minPadding.x * 2 - dot.x_space) / (dot.w + dot.x_space)),
-        h: Math.floor((canvas.height - minPadding.y * 2 - dot.y_space) / (dot.h + dot.y_space)),
-      },
-      offset = {
-        x: canvas.width - (matrix.w * (dot.w + dot.x_space)) - dot.x_space - minPadding.x,
-        y: canvas.height - (matrix.h * (dot.h + dot.y_space)) - dot.y_space - minPadding.y
-      };
+  this.dotProperties.width = dotWidth;
+  this.dotProperties.height = dotHeight;
+  this.dotProperties.xSpace = dotXSpace;
+  this.dotProperties.ySpace = dotXSpace;
 
-    console.log(canvas, dot, matrix, offset);
+  this.minPadding = {};
+  this.minPadding.x = minPaddingX;
+  this.minPadding.y = minPaddingY;
 
-  });
-}).call(this)
+  this.canvasHeight = function (){ return this.canvas.height; }
+  this.canvasWidth = function (){ return this.canvas.width; }
+
+  this.width = Math.floor((this.canvasWidth() - this.minPadding.x * 2 - this.dotProperties.xSpace) / (this.dotProperties.width + this.dotProperties.xSpace));
+  this.height = Math.floor((this.canvasHeight() - this.minPadding.y * 2 - this.dotProperties.ySpace) / (this.dotProperties.height + this.dotProperties.ySpace));
+
+  this.padding = {};
+  this.padding.x = this.canvas.width - (this.width * (this.dotProperties.width + this.dotProperties.xSpace)) - this.dotProperties.xSpace - this.minPadding.x;
+  this.padding.y = this.canvas.height - (this.height * (this.dotProperties.height + this.dotProperties.ySpace)) - this.dotProperties.ySpace - this.minPadding.y;
+
+  return this;
+
+};
+
+$(document).ready(function(){
+  matrix = new Matrix('#nerdmatrix');
+  log(matrix);
+});
