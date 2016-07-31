@@ -52,18 +52,18 @@ function Matrix(args) {
   this.dotProperties.yArea = this.dotProperties.height + this.dotProperties.ySpace;
 
   this.minPadding = {};
-  this.minPadding.x = _settings.minPaddingX * 2;
-  this.minPadding.y = _settings.minPaddingY * 2;
+  this.minPadding.x = _settings.minPaddingX;
+  this.minPadding.y = _settings.minPaddingY;
 
-  this.canvasHeight = function (){ return this.canvas.height; }
-  this.canvasWidth = function (){ return this.canvas.width; }
+  this.canvasHeight = function (){ return this.canvas.height / 2; }
+  this.canvasWidth = function (){ return this.canvas.width / 2; }
 
-  this.width = Math.floor(((this.canvasWidth() - this.minPadding.x * 2 - this.dotProperties.xSpace) / (this.dotProperties.width + this.dotProperties.xSpace))/2);
-  this.height = Math.floor(((this.canvasHeight() - this.minPadding.y * 2 - this.dotProperties.ySpace) / (this.dotProperties.height + this.dotProperties.ySpace))/2);
+  this.width = Math.floor(((this.canvasWidth() - this.minPadding.x - this.dotProperties.xSpace) / this.dotProperties.xArea));
+  this.height = Math.floor(((this.canvasHeight() - this.minPadding.y - this.dotProperties.ySpace) / this.dotProperties.xArea));
 
   this.padding = {};
-  this.padding.x = Math.floor(this.canvas.width / 2 - (this.width * (this.dotProperties.width + this.dotProperties.xSpace)) - this.dotProperties.xSpace - this.minPadding.x)*2;
-  this.padding.y = Math.floor(this.canvas.height / 2 - (this.height * (this.dotProperties.height + this.dotProperties.ySpace)) - this.dotProperties.ySpace - this.minPadding.y)*2;
+  this.padding.x = Math.floor((this.canvas.width / 2 - this.width * this.dotProperties.xArea)/2);
+  this.padding.y = Math.floor((this.canvas.height / 2 - this.height * this.dotProperties.yArea)/2);
 
   this.Grid = function(width, height, context){
 
@@ -191,7 +191,9 @@ $(document).ready(function(){
       dotWidth: 6,
       dotHeight: 6,
       dotXSpace: 2,
-      dotYSpace: 2
+      dotYSpace: 2,
+      minPaddingX: 5,
+      minPaddingY: 5
   });
   log(matrix);
 });
