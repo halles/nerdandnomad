@@ -82,8 +82,8 @@ function Matrix(args) {
       this.x = x;
       this.y = y;
       this.rotate = 0;
-      this.centerX = x * _matrix.width + _matrix.dotProperties.xArea / 2;
-      this.centerY = y * _matrix.height + _matrix.dotProperties.yArea / 2;
+      this.centerX = x * _matrix.dotProperties.xArea + _matrix.dotProperties.xArea / 2 + _matrix.padding.x;
+      this.centerY = y * _matrix.dotProperties.yArea + _matrix.dotProperties.yArea / 2 + _matrix.padding.y;
       this.radiusX = _matrix.dotProperties.width / 2;
       this.radiusY = _matrix.dotProperties.height / 2;
       this.neighbours = new Array;
