@@ -36,8 +36,11 @@ function Matrix(args) {
   this.canvas = this.container.append('<canvas></canvas>').children('canvas')[0];
   this.context = this.canvas.getContext("2d");
 
-  this.canvas.height = this.container.height();
-  this.canvas.width = this.container.width();
+  this.canvas.height = this.container.height() * 2;
+  this.canvas.width = this.container.width() * 2;
+  this.canvas.style.width = this.container.width() + "px";
+  this.canvas.style.height = this.container.height() + "px";
+  this.context.scale(2,2);
 
   this.dotProperties = {};
   this.dotProperties.width = _settings.dotWidth;
