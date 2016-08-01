@@ -1,4 +1,4 @@
-var DEBUG = false;
+var DEBUG = true;
 
 var log = function(){
   if(!DEBUG) return;
@@ -17,7 +17,8 @@ function Matrix(args) {
     dotYSpace: 3,
     minPaddingX: 5,
     minPaddingY: 5,
-    liveDraw: false
+    liveDraw: false,
+    baseColour: {r:245, g: 245, b: 245}
   }
 
   if(!args || args.length == 0){
@@ -52,6 +53,8 @@ function Matrix(args) {
   this.dotProperties.xArea = this.dotProperties.width + this.dotProperties.xSpace;
   this.dotProperties.yArea = this.dotProperties.height + this.dotProperties.ySpace;
 
+  this.dotProperties.baseColour = new Colour(_settings.baseColour.r, _settings.baseColour.g, _settings.baseColour.b);
+
   this.minPadding = {};
   this.minPadding.x = _settings.minPaddingX;
   this.minPadding.y = _settings.minPaddingY;
@@ -80,7 +83,9 @@ function Matrix(args) {
 
       this.context = _grid.context;
 
-      this.colour = new Colour(245,245,245);
+      this.colour = new Colour(_settings.baseColour.r, _settings.baseColour.g, _settings.baseColour.b);
+      this.currentColour = new Colour(_settings.baseColour.r, _settings.baseColour.g, _settings.baseColour.b);
+      this.magicColour = new Colour(_settings.baseColour.r, _settings.baseColour.g, _settings.baseColour.b);
       this.x = x;
       this.y = y;
       this.rotate = 0;
@@ -100,27 +105,38 @@ function Matrix(args) {
         return this.colour;
       }
 
+      this.setMagicColour = function ( newCol ){
+        this.magicColour.r = newCol.r;
+        this.magicColour.g = newCol.g;
+        this.magicColour.b = newCol.b;
+        return this.magicColour;
+      }
+
+      this.getMagicColour = function (){
+        return this.magicColour;
+      }
+
       this.setNeighbours = function( neighbours ) {
-      	this.neighbours = neighbours;
+        this.neighbours = neighbours;
       }
 
       this.draw = function() {
 
         var ctx = this.context;
 
-        ctx.fillStyle = this.getColour().toRgba(0.5);
-        ctx.strokeStyle = this.getColour().toRgba(1);
+        ctx.fillStyle = this.getMagicColour().toRgba(1);
 
         ctx.beginPath();
         ctx.ellipse(this.centerX, this.centerY, this.radiusX, this.radiusY, 0, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.save();
-
-        ctx.restore();
 
       }
 
-      this.draw();
+      this.magic = function() {
+        if(this.magicColour.r != this.colour.r || this.magicColour.g != this.colour.g || this.magicColour.g != this.colour.b){
+            this.setMagicColour(averageColours( this.colour, this.magicColour));
+        }
+      }
 
     }
 
@@ -221,6 +237,10 @@ function Matrix(args) {
 
       var count = 0;
 
+      var theColour = new Colour(127,240,70);
+      var magicColour = new Colour(127,240,70);
+      magicColour.add(100);
+
       for(i = 0; i < word.length; i++){
         count++;
         charWidth = 0;
@@ -229,8 +249,8 @@ function Matrix(args) {
           var x = this.alphabet[character][cxy][0]+ this.cursor.x;
           var y = this.alphabet[character][cxy][1]+ this.cursor.y;
           var dot = _matrix.grid.dots[x][y];
-          dot.setColour(new Colour(127,240,70));
-          dot.draw();
+          dot.setMagicColour(theColour);
+          dot.setColour(magicColour);
           charWidth = (this.alphabet[character][cxy][0] > charWidth)?this.alphabet[character][cxy][0]:charWidth;
         }
         this.cursor.x += charWidth + 2;
@@ -988,23 +1008,26 @@ function Matrix(args) {
     },
     draw: function(){
 
-      function doDot(x,y,c){
+      function doDot(x,y,c,m){
+        if(!this.matrix.grid.dots[x] || !this.matrix.grid.dots[x][y]) return;
         var dot = this.matrix.grid.dots[x][y];
-        dot.setColour(new Colour(c.r,c.g,c.b));
-        dot.draw();
+        dot.setMagicColour(m);
+        dot.setColour(c);
       }
 
       function processData(dataSet, colour){
-
+        colour = new Colour(colour.r,colour.g,colour.b);
+        magic = new Colour(colour.r,colour.g,colour.b);
+        magic.add(200);
         for(var y in dataSet){
           for(var ix in dataSet[y]){
             if(dataSet[y][ix].length > 1){
               for(x = dataSet[y][ix][0]; x <= dataSet[y][ix][1]; x++){
-                doDot(x,y,colour);
+                doDot(x,y,colour,magic);
               }
             }else{
               x = dataSet[y][ix][0];
-              doDot(x,y,colour);
+              doDot(x,y,colour,magic);
             }
           }
         }
@@ -1038,9 +1061,25 @@ function Matrix(args) {
     }
   }
 
-  this.testHit = function(x,y){
-    var hit;
-    return this.grid.getDotAt(x,y);
+  var avused = 0;
+
+  function averageColours(col2, col1) {
+
+    newCol = new Colour;
+    if (col1.r < col2.r) newCol.r = col1.r + 10;
+    else if (col1.r > col2.r) newCol.r = col1.r - 10;
+    else newCol.r = col1.r;
+
+    if (col1.g < col2.g) newCol.g = col1.g + 10;
+    else if (col1.g > col2.g) newCol.g = col1.g - 10;
+    else newCol.g = col1.g;
+
+    if (col1.b < col2.b) newCol.b = col1.b + 10;
+    else if (col1.b > col2.b) newCol.b = col1.b - 10;
+    else newCol.b = col1.b;
+
+    return newCol;
+
   }
 
   this.liveDrawDots = Array();
@@ -1049,17 +1088,41 @@ function Matrix(args) {
     setTimeout(function(){
       log('liveDraw!');
       _matrix.canvas.addEventListener('click', function(e) {
-        if(dot = _matrix.testHit(e.offsetX, e.offsetY)){
+        var dot;
+        if(dot = _matrix.grid.getDotAt(e.offsetX, e.offsetY)){
           _matrix.liveDrawDots.push([dot.x,dot.y]);
+          dot.setMagicColour(new Colour(100,100,100));
           dot.setColour(new Colour(127,240,70));
-          dot.draw();
-          log(JSON.stringify(_matrix.liveDrawDots));
         }
       }, true);
     }, 1000);
   }
 
   this.grid = new this.Grid(this.width, this.height, this.context);
+
+  var tickCounter = 0;
+
+  this.tick = function() {
+
+    _matrix.context.clearRect(0, 0, _matrix.canvas.width / 2, _matrix.canvas.height / 2);
+    _matrix.context.save();
+
+    var start = new Date();
+
+    for (x = 0; x < _matrix.grid.dots.length-1; x ++) {
+      for (y = 0; y < _matrix.grid.dots[x].length-1; y ++) {
+        _matrix.grid.dots[x][y].magic();
+        _matrix.grid.dots[x][y].draw();
+      }
+    }
+    _matrix.context.restore();
+
+    var end = new Date();
+    console.log(end-start);
+
+  };
+
+  this.ticker = setInterval(this.tick, 500);
 
   return this;
 
@@ -1075,7 +1138,8 @@ $(document).ready(function(){
       dotYSpace: 2,
       minPaddingX: 5,
       minPaddingY: 5,
-      liveDraw: true
+      liveDraw: true,
+      baseColour: {r:230,g:230,b:230}
   });
 
   matrix.world.draw();
